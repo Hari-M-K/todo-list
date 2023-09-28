@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="Sandeep Nagaraj,">
+<title>Spring Boot 3 Upgrade Report</title>
+<link rel="stylesheet" href="css/site.css">
+<script src="js/setup.js"></script><script defer src="js/site.js"></script>
+
+</head>
+<body id="index" class="book toc2 toc-left"><div id="banner-container" class="container" role="banner">
+  <div id="banner" class="contained" role="banner">
+    <div id="switch-theme">
+      <input type="checkbox" id="switch-theme-checkbox" />
+      <label for="switch-theme-checkbox">Dark Theme</label>
+    </div>
+  </div>
+</div>
+<div id="tocbar-container" class="container" role="navigation">
+  <div id="tocbar" class="contained" role="navigation">
+    <button id="toggle-toc"></button>
+  </div>
+</div>
+<div id="main-container" class="container">
+  <div id="main" class="contained">
+    <div id="doc" class="doc">
+<div id="header">
+<h1>Spring Boot 3 Upgrade Report</h1>
+<div class="details">
+<span id="author" class="author">Sandeep Nagaraj,</span><br>
+<span id="revdate">Fabian Krüger</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<span id="back-to-index"><a href="index.html">Back to index</a></span><ul class="sectlevel1">
+<li><a href="#introduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#application-information">1.1. Application Information</a></li>
+</ul>
+</li>
+<li><a href="#relevant-changes">2. Relevant Changes</a>
+<ul class="sectlevel2">
+<li><a href="#auto-configuration-of-micrometers-jvminfometrics">2.1. Auto-configuration of Micrometer&#8217;s JvmInfoMetrics</a></li>
+<li><a href="#actuator-metrics-export-properties">2.2. Actuator Metrics Export Properties</a></li>
+<li><a href="#micrometer-binders">2.3. Micrometer binders</a></li>
+<li><a href="#updated-phases-for-graceful-shutdown">2.4. Updated Phases for Graceful Shutdown</a></li>
+<li><a href="#yamljsonparser-has-been-removed">2.5. YamlJsonParser Has Been Removed</a></li>
+<li><a href="#server-max-http-header-size">2.6. 'server.max-http-header-size'</a></li>
+<li><a href="#auto-configuration-files">2.7. Auto-configuration Files</a></li>
+<li><a href="#mongo-health-check">2.8. Mongo Health Check</a></li>
+<li><a href="#git-commit-id-maven-plugin">2.9. Git Commit ID Maven Plugin</a></li>
+<li><a href="#tag-providers-and-contributors-migration">2.10. Tag providers and contributors migration</a></li>
+<li><a href="#running-your-application-in-the-maven-process">2.11. Running Your Application in the Maven Process</a></li>
+<li><a href="#deprecation-of-the-spring-boot-2-x-instrumentation">2.12. Deprecation of the Spring Boot 2.x instrumentation</a></li>
+<li><a href="#other-removals">2.13. Other Removals</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="introduction"><a class="anchor" href="#introduction"></a>1. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This report aims to help with updating spring Boot applications from 2.7 to 3.0.
+The listed changes should be applied in the given order.
+It follows basically this order:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Prepare the 2.7 application</p>
+</li>
+<li>
+<p>Upgrade Spring Security to 5.8</p>
+</li>
+<li>
+<p>Upgrade to Spring Boot 3.0</p>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The recipes should be applied in the given order!
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can find us on GitHub.
+Please report all problems.</p>
+</div>
+<div class="sect2">
+<h3 id="application-information"><a class="anchor" href="#application-information"></a>1.1. Application Information</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Scanned dir</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C:\Users\PL358KA\Workspace\tools\todo-list</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Revision</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a81addcdb3f6cc56f6c5ea77839bfd0c04b11764</code></p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Coordinate</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">lionel.learnspring:todo-list:1.0-SNAPSHOT</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Boot version</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2.7.3</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Changes</p></th>
+<td class="tableblock halign-left valign-top"><p class="tableblock">13</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The application was scanned and matched against the changes listed in the
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Release-Notes">Spring Boot 3.0 Release Notes</a>
+as well as from <a href="https://github.com/spring-projects/spring-framework/wiki/Upgrading-to-Spring-Framework-5.x">Spring Framework 5.x Release Notes</a>.</p>
+</div>
+<div class="paragraph">
+<p>The Relevant Changes section lists all potentially required changes to upgrade the scanned application to Spring Boot 3.0.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+JDK 17 is required for Spring Boot 3
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="relevant-changes"><a class="anchor" href="#relevant-changes"></a>2. Relevant Changes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section lists the changes SBM found to be applicable to upgrade the scanned application to Spring Boot 3.0.0.</p>
+</div>
+<div class="run-all-recipe" >
+
+</div>
+<div class="sect2">
+<h3 id="auto-configuration-of-micrometers-jvminfometrics"><a class="anchor" href="#auto-configuration-of-micrometers-jvminfometrics"></a>2.1. Auto-configuration of Micrometer&#8217;s JvmInfoMetrics</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/620" class="ext-link" target="_blank" rel="noopener">#620</a> <br>
+<strong>Projects:</strong> spring-observability</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed"><a class="anchor" href="#what-changed"></a>What Changed</h4>
+<div class="paragraph">
+<p>Micrometer&#8217;s <code>JvmInfoMetrics</code> is now auto-configured. Any manually configured <code>JvmInfoMetrics</code> bean definition can be removed.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected"><a class="anchor" href="#why-is-the-application-affected"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>io\.micrometer\:micrometer-.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation"><a class="anchor" href="#remediation"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#auto-configuration-of-micrometer-s-jvminfometrics" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/620" class="ext-link" target="_blank" rel="noopener">#620</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="actuator-metrics-export-properties"><a class="anchor" href="#actuator-metrics-export-properties"></a>2.2. Actuator Metrics Export Properties</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/626" class="ext-link" target="_blank" rel="noopener">#626</a> <br>
+<strong>Projects:</strong> spring-observability</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-2"><a class="anchor" href="#what-changed-2"></a>What Changed</h4>
+<div class="paragraph">
+<p>We have moved the properties controlling the <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#actuator.metrics">actuator metrics export</a>.
+The old schema was <code>management.metrics.export.&lt;product&gt;</code>, the new one is <code>management.&lt;product&gt;.metrics.export</code> (Example: the prometheus properties moved from <code>management.metrics.export.prometheus</code> to <code>management.prometheus.metrics.export</code>).
+If you are using the <code>spring-boot-properties-migrator</code>, you will get notified at startup.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="https://github.com/spring-projects/spring-boot/issues/30381">issue #30381</a> for details.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-2"><a class="anchor" href="#why-is-the-application-affected-2"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>io\.micrometer\:micrometer-.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-2"><a class="anchor" href="#remediation-2"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#actuator-metrics-export-properties" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/626" class="ext-link" target="_blank" rel="noopener">#626</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="micrometer-binders"><a class="anchor" href="#micrometer-binders"></a>2.3. Micrometer binders</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/628" class="ext-link" target="_blank" rel="noopener">#628</a> <br>
+<strong>Projects:</strong> spring-observability</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-3"><a class="anchor" href="#what-changed-3"></a>What Changed</h4>
+<div class="paragraph">
+<p>The Micrometer team moved the binders to a separate micrometer module named <code>micrometer-binders</code>.
+To prevent split packages, the imports have changed, too. If you are using the old binders, please adjust your imports from <code>io.micrometer.core.instrument.binder</code> to <code>io.micrometer.binder</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-3"><a class="anchor" href="#why-is-the-application-affected-3"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>io\.micrometer\:micrometer-.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-3"><a class="anchor" href="#remediation-3"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#micrometer-binders" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/628" class="ext-link" target="_blank" rel="noopener">#628</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="updated-phases-for-graceful-shutdown"><a class="anchor" href="#updated-phases-for-graceful-shutdown"></a>2.4. Updated Phases for Graceful Shutdown</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/630" class="ext-link" target="_blank" rel="noopener">#630</a> <br>
+<strong>Projects:</strong> spring-web</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-4"><a class="anchor" href="#what-changed-4"></a>What Changed</h4>
+<div class="paragraph">
+<p>The phases used by the <code>SmartLifecycle</code> implementations for graceful shutdown have been updated.
+Graceful shutdown now begins in phase <code>SmartLifecycle.DEFAULT_PHASE - 2048</code> and the web server is stopped in phase <code>SmartLifecycle.DEFAULT_PHASE - 1024</code>.
+Any <code>SmartLifecycle</code> implementations that were participating in graceful shutdown should be updated accordingly.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-4"><a class="anchor" href="#why-is-the-application-affected-4"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>org\.springframework\.boot\:spring-boot\:.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-4"><a class="anchor" href="#remediation-4"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#updated-phases-for-graceful-shutdown" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/630" class="ext-link" target="_blank" rel="noopener">#630</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="yamljsonparser-has-been-removed"><a class="anchor" href="#yamljsonparser-has-been-removed"></a>2.5. YamlJsonParser Has Been Removed</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/644" class="ext-link" target="_blank" rel="noopener">#644</a> <br>
+<strong>Projects:</strong> spring-boot</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-5"><a class="anchor" href="#what-changed-5"></a>What Changed</h4>
+<div class="paragraph">
+<p><code>YamlJsonParser</code> has been removed as SnakeYAML&#8217;s JSON parsing was inconsistent with the other parser implementations.
+In the unlikely event that you were using <code>YamlJsonParser</code> directly, please migrate to one of the other <code>JsonParser</code> implementations.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-5"><a class="anchor" href="#why-is-the-application-affected-5"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>org\.springframework\.boot\:spring-boot-starter\:.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-5"><a class="anchor" href="#remediation-5"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#yamljsonparser-has-been-removed" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/644" class="ext-link" target="_blank" rel="noopener">#644</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="server-max-http-header-size"><a class="anchor" href="#server-max-http-header-size"></a>2.6. 'server.max-http-header-size'</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/652" class="ext-link" target="_blank" rel="noopener">#652</a> <br>
+<strong>Projects:</strong> spring-web</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-6"><a class="anchor" href="#what-changed-6"></a>What Changed</h4>
+<div class="paragraph">
+<p>Previously, the <code>server.max-http-header-size</code> was treated inconsistently across the four supported embedded web servers.
+When using Jetty, Netty, or Undertow it would configure the max HTTP request header size.
+When using Tomcat it would configure the max HTTP request and response header sizes.</p>
+</div>
+<div class="paragraph">
+<p>To address this inconsistency, <code>server.max-http-header-size</code> has been deprecated and a replacement, <code>server.max-http-request-header-size</code>, has been introduced.
+Both properties now only apply to the request header size, irrespective of the underlying web server.</p>
+</div>
+<div class="paragraph">
+<p>To limit the max header size of an HTTP response on Tomcat or Jetty (the only two servers that support such a setting), use a <code>WebServerFactoryCustomizer</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-6"><a class="anchor" href="#why-is-the-application-affected-6"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>org\.springframework\.boot\:spring-boot\:.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-6"><a class="anchor" href="#remediation-6"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#-server.max-http-header-size-" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/652" class="ext-link" target="_blank" rel="noopener">#652</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="auto-configuration-files"><a class="anchor" href="#auto-configuration-files"></a>2.7. Auto-configuration Files</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/654" class="ext-link" target="_blank" rel="noopener">#654</a> <br>
+<strong>Projects:</strong> spring-boot</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-7"><a class="anchor" href="#what-changed-7"></a>What Changed</h4>
+<div class="paragraph">
+<p>Spring Boot 2.7 <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.7-Release-Notes#changes-to-auto-configuration">introduced</a> a new <code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code> file for registering auto-configurations, while maintaining backwards compatibility with registration in <code>spring.factories</code>.
+With this release, support for registering auto-configurations in <code>spring.factories</code> has been removed in favor of the imports file.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-7"><a class="anchor" href="#why-is-the-application-affected-7"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>org\.springframework\.boot\:spring-boot-starter\:.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-7"><a class="anchor" href="#remediation-7"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#auto-configuration-files" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/654" class="ext-link" target="_blank" rel="noopener">#654</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mongo-health-check"><a class="anchor" href="#mongo-health-check"></a>2.8. Mongo Health Check</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/658" class="ext-link" target="_blank" rel="noopener">#658</a> <br>
+<strong>Projects:</strong> spring-observability</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-8"><a class="anchor" href="#what-changed-8"></a>What Changed</h4>
+<div class="paragraph">
+<p>The <code>HealthIndicator</code> for MongoDB now supports MongoDB&#8217;s Stable API.
+The <code>buildInfo</code> query has been replaced with <code>isMaster</code> and the response now contains <code>maxWireVersion</code> instead of <code>version</code>.
+As described in the <a href="https://www.mongodb.com/docs/v4.2/reference/command/isMaster/">MongoDB documentation</a>, clients may use <code>maxWireVersion</code> to help negotiate compatibility with MongoDB.
+Note that <code>maxWireVersion</code> is an integer.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-8"><a class="anchor" href="#why-is-the-application-affected-8"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>io\.micrometer\:micrometer-.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-8"><a class="anchor" href="#remediation-8"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#mongo-health-check" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/658" class="ext-link" target="_blank" rel="noopener">#658</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="git-commit-id-maven-plugin"><a class="anchor" href="#git-commit-id-maven-plugin"></a>2.9. Git Commit ID Maven Plugin</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/660" class="ext-link" target="_blank" rel="noopener">#660</a> <br>
+<strong>Projects:</strong> spring-boot</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-9"><a class="anchor" href="#what-changed-9"></a>What Changed</h4>
+<div class="paragraph">
+<p>The Git Commit ID Maven Plugin has been updated to version 5 where its coordinates have changed.
+The previous coordinates were <code>pl.project13.maven:git-commit-id-plugin</code>.
+The new coordinates are <code>io.github.git-commit-id:git-commit-id-maven-plugin</code>.
+Any <code>&lt;plugin&gt;</code> declaration in your <code>pom.xml</code> file should be updated accordingly.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-9"><a class="anchor" href="#why-is-the-application-affected-9"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>org\.springframework\.boot\:spring-boot-starter\:.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-9"><a class="anchor" href="#remediation-9"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#git-commit-id-maven-plugin" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/660" class="ext-link" target="_blank" rel="noopener">#660</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tag-providers-and-contributors-migration"><a class="anchor" href="#tag-providers-and-contributors-migration"></a>2.10. Tag providers and contributors migration</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/664" class="ext-link" target="_blank" rel="noopener">#664</a> <br>
+<strong>Projects:</strong> spring-observability</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-10"><a class="anchor" href="#what-changed-10"></a>What Changed</h4>
+<div class="paragraph">
+<p>If your application is customizing metrics, you might see new deprecations in your codebase. In our new model, both tag providers and contributors are replaced by observation conventions. Let&#8217;s take the example of the Spring MVC "http.server.requests" metrics instrumentation support in Spring Boot 2.x.</p>
+</div>
+<div class="paragraph">
+<p>If you are contributing additional <code>Tags</code> with <code>TagContributor</code> or only partially overriding a <code>TagProvider</code>, you should probably extend the <code>DefaultServerRequestObservationConvention</code> for your requirements:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class ExtendedServerRequestObservationConvention extends DefaultServerRequestObservationConvention {
+
+  @Override
+  public KeyValues getLowCardinalityKeyValues(ServerRequestObservationContext context) {
+    // here, we just want to have an additional KeyValue to the observation, keeping the default values
+    return super.getLowCardinalityKeyValues(context).and(custom(context));
+  }
+
+  protected KeyValue custom(ServerRequestObservationContext context) {
+    return KeyValue.of("custom.method", context.getCarrier().getMethod());
+  }
+
+}
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are significantly changing metrics <code>Tags</code>, you are probably replacing the <code>WebMvcTagsProvider</code> with a custom implementation and contributing it as a bean. In this case, you should probably implement the convention for the observation you&#8217;re interested in. Here, we&#8217;ll implement <code>ServerRequestObservationConvention</code> - it&#8217;s using <code>ServerRequestObservationContext</code> to extract information about the current request. You can then implement methods with your requirements in mind:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class CustomServerRequestObservationConvention implements ServerRequestObservationContext {
+
+  @Override
+  public String getName() {
+    // will be used for the metric name
+    return "http.server.requests";
+  }
+
+  @Override
+  public String getContextualName(ServerRequestObservationContext context) {
+    // will be used for the trace name
+    return "http " + context.getCarrier().getMethod().toLowerCase();
+  }
+
+  @Override
+  public KeyValues getLowCardinalityKeyValues(ServerRequestObservationContext context) {
+    return KeyValues.of(method(context), status(context), exception(context));
+  }
+
+  @Override
+  public KeyValues getHighCardinalityKeyValues(ServerRequestObservationContext context) {
+    return KeyValues.of(httpUrl(context));
+  }
+
+  protected KeyValue method(ServerRequestObservationContext context) {
+    // You should reuse as much as possible the corresponding ObservationDocumentation for key names
+    return KeyValue.of(ServerHttpObservationDocumentation.LowCardinalityKeyNames.METHOD, context.getCarrier().getMethod());
+  }
+
+  //...
+}
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In both cases, you can contribute those as beans to the application context and they will be picked up by the auto-configuration, effectively replacing the default ones.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Configuration
+public class CustomMvcObservationConfiguration {
+
+  @Bean
+  public ExtendedServerRequestObservationConvention extendedServerRequestObservationConvention() {
+    return new ExtendedServerRequestObservationConvention();
+  }
+
+}
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also similar goals using a custom <code>ObservationFilter</code> - adding or removing key values for an observation.
+Filters do not replace the default convention and are used as a post-processing component.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class ServerRequestObservationFilter implements ObservationFilter {
+
+  @Override
+  public Observation.Context map(Observation.Context context) {
+    if (context instanceof ServerRequestObservationContext serverContext) {
+      context.addLowCardinalityKeyValue(KeyValue.of("project", "spring"));
+      String customAttribute = (String) serverContext.getCarrier().getAttribute("customAttribute");
+      context.addLowCardinalityKeyValue(KeyValue.of("custom.attribute", customAttribute));
+    }
+    return context;
+  }
+}
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can contribute <code>ObservationFilter</code> beans to your application and Spring Boot will auto-configure them with the <code>ObservationRegistry</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-10"><a class="anchor" href="#why-is-the-application-affected-10"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>io\.micrometer\:micrometer-.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-10"><a class="anchor" href="#remediation-10"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#tag-providers-and-contributors-migration" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/664" class="ext-link" target="_blank" rel="noopener">#664</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="running-your-application-in-the-maven-process"><a class="anchor" href="#running-your-application-in-the-maven-process"></a>2.11. Running Your Application in the Maven Process</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/666" class="ext-link" target="_blank" rel="noopener">#666</a> <br>
+<strong>Projects:</strong> spring-boot</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-11"><a class="anchor" href="#what-changed-11"></a>What Changed</h4>
+<div class="paragraph">
+<p>The <code>fork</code> attribute of <code>spring-boot:run</code> and <code>spring-boot:start</code> that was deprecated in Spring Boot 2.7 has been removed.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-11"><a class="anchor" href="#why-is-the-application-affected-11"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>org\.springframework\.boot\:spring-boot-starter\:.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-11"><a class="anchor" href="#remediation-11"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#running-your-application-in-the-maven-process" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/666" class="ext-link" target="_blank" rel="noopener">#666</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="deprecation-of-the-spring-boot-2-x-instrumentation"><a class="anchor" href="#deprecation-of-the-spring-boot-2-x-instrumentation"></a>2.12. Deprecation of the Spring Boot 2.x instrumentation</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/676" class="ext-link" target="_blank" rel="noopener">#676</a> <br>
+<strong>Projects:</strong> spring-observability</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-12"><a class="anchor" href="#what-changed-12"></a>What Changed</h4>
+<div class="paragraph">
+<p>As a result of the integration with the Observation support, we are now deprecating the previous instrumentation.
+The filters, interceptors performing the actual instrumentation have been removed entirely, as entire classes of bugs could not be resolved and the risk of duplicate instrumentation was too high. For example, the <code>WebMvcMetricsFilter</code> has been deleted entirely and is effectively replaced by Spring Framework&#8217;s <code>ServerHttpObservationFilter</code>.
+The corresponding <code>*TagProvider</code> <code>*TagContributor</code> and <code>*Tags</code> classes have been deprecated.
+They are not used by default anymore by the observation instrumentation.
+We are keeping them around during the deprecation phase so that developers can migrate their existing infrastructure to the new one.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-12"><a class="anchor" href="#why-is-the-application-affected-12"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>io\.micrometer\:micrometer-.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-12"><a class="anchor" href="#remediation-12"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#deprecation-of-the-spring-boot-2.x-instrumentation" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/676" class="ext-link" target="_blank" rel="noopener">#676</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="other-removals"><a class="anchor" href="#other-removals"></a>2.13. Other Removals</h3>
+<div class="paragraph">
+<p><strong>Issue:</strong> <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/686" class="ext-link" target="_blank" rel="noopener">#686</a> <br>
+<strong>Projects:</strong> spring-boot</p>
+</div>
+<div class="sect3">
+<h4 id="what-changed-13"><a class="anchor" href="#what-changed-13"></a>What Changed</h4>
+<div class="paragraph">
+<p>Support for the following dependencies has been removed in Spring Boot 3.0:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Apache ActiveMQ</p>
+</li>
+<li>
+<p>Atomikos</p>
+</li>
+<li>
+<p>EhCache 2</p>
+</li>
+<li>
+<p>Hazelcast 3</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Support for Apache Solr has been removed as its Jetty-based client, <code>Http2SolrClient</code>, is not compatible with Jetty 11.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="why-is-the-application-affected-13"><a class="anchor" href="#why-is-the-application-affected-13"></a>Why is the application affected</h4>
+<div class="paragraph">
+<p>Actually, we don&#8217;t know if the scanned application is really affected by this change.
+But we found a dependency matching regex <code>org\.springframework\.boot\:spring-boot-starter\:.*</code>.
+This indicates that the scanned application might be affected.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="remediation-13"><a class="anchor" href="#remediation-13"></a>Remediation</h4>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This section has been automatically generated from the <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide#other-removals" class="ext-link" target="_blank" rel="noopener">Spring Boot 3.0 Migration Guide</a>.<br>
+<strong>Please consider contributing to issue <a href="https://github.com/spring-projects-experimental/spring-boot-migrator/issues/686" class="ext-link" target="_blank" rel="noopener">#686</a></strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We want to say thank you to all Contributors:</p>
+</div>
+<div class="paragraph">
+<p>Generated by Spring Boot Migrator (experimental)</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2023-09-28 11:17:17 +0100
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/languages/java.min.js"></script>
+<script>
+if (!hljs.initHighlighting.called) {
+  hljs.initHighlighting.called = true
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
+}
+</script>
+</div>
+  </div>
+</div>
+</body>
+</html>
